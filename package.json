@@ -10,6 +10,9 @@
   "license": "BSD",
   "dependencies": {
     "node-foursquare": "~0.2.0",
-    "express": "~3.4.0"
+    "express": "~3.4.0",
+    "cocaine": "*",
+    "optimist": "~0.6.0",
+    "q": "~0.9.7"
   }
 }
