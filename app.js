@@ -107,4 +107,4 @@ app.get('/login', function(req, res) {
     res.end();
 });
 
-app.listen(argv.uuid ? handle : 8000);
+argv.uuid ? server.listen(handle) : app.listen(8000);
