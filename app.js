@@ -51,7 +51,14 @@ var BEMHTML = require('./desktop.bundles/index/_index.bemhtml.js').BEMHTML,
 
 app.get('/', function(req, res) {
 
-    foursquare.getAccessToken({
+
+    argv.uuid ? Q.all([_detectAgent(req), _detectRegion(req)])
+        .spread(function(agent, region) {
+            res.send('agent', agent, 'region', region);
+        })
+        .fail(function(error){
+            res.end(error.toString());
+        }) : foursquare.getAccessToken({
         code: req.query.code
     }, function (error, accessToken) {
 
@@ -96,7 +103,7 @@ var _detectAgent = function(req) {
     var ua = req.headers['user-agent'];
 
     if (ua) {
-        return uatraits.detect(ua);
+        return app.get('uatraits').detect(ua);
     } else {
         F.resolve();
     }
@@ -104,7 +111,9 @@ var _detectAgent = function(req) {
     return F.promise;
 },
     _detectRegion = function(req) {
-    var F = Q.defer();
+
+    var geobase = app.get('geobase'),
+        F = Q.defer();
 
     var ip = req.headers['x-real-ip'];
     if (ip && net.isIPv4(ip)) {
@@ -137,16 +146,9 @@ var initApp = function() {
 };
 
 argv.uuid ? cocaine.getServices(['geobase', 'uatraits'], function(geobase, uatraits) {
+    app.set('geobase', geobase);
+    app.set('uatraits', uatraits);
 
-    Q.all([_detectAgent(req), _detectRegion(req)])
-        .spread(function(agent, region) {
-            app.set('agent', agent);
-            app.set('region', region);
-
-            initApp();
-        })
-        .fail(function(error){
-            res.end(error.toString());
-        });
+    initApp();
 
 }) : initApp();
