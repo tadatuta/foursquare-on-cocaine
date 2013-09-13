@@ -54,7 +54,7 @@ app.get('/', function(req, res) {
 
     argv.uuid ? Q.all([_detectAgent(req), _detectRegion(req)])
         .spread(function(agent, region) {
-            res.send('agent', agent, 'region', region);
+            res.send('agent: ' + JSON.stringify(agent) + ' region ' +  JSON.stringify(region));
         })
         .fail(function(error){
             res.end(error.toString());
