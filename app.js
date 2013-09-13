@@ -116,7 +116,7 @@ var _detectAgent = function(req) {
         F = Q.defer();
 
     var ip = req.headers['x-real-ip'];
-    if (ip && net.isIPv4(ip)) {
+    if (ip) {
 
         return geobase.region_id(ip)
             .then(function(region_id){
