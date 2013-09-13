@@ -8,10 +8,6 @@ var net = require('net'),
     server = new co.http.Server(),
     handle = Worker.getListenHandle('http');
 
-var foursquare = require('node-foursquare')(config),
-    express = require('express'),
-    app = express();
-
 var config = {
     'secrets' : {
         'clientId' : 'BC5WFLKKNYREHXENVUUARGLPVJ25GVUJMKQLA4VQELZE4OCP',
@@ -19,6 +15,10 @@ var config = {
         'redirectUrl' : 'http://localhost:8000'
     }
 };
+
+var foursquare = require('node-foursquare')(config),
+    express = require('express'),
+    app = express();
 
 co.getServices(['geobase', 'uatraits'], function(geobase, uatraits) {
 
@@ -28,9 +28,9 @@ co.getServices(['geobase', 'uatraits'], function(geobase, uatraits) {
             .spread(function(agent, region) {
                 agent && (agent = JSON.stringify(agent, null, 2));
 
-                console.log('region', region);
+                res.send('region', region);
 
-                console.log('req.query.code', req.query.code);
+                res.send('req.query.code', req.query.code);
 
                 foursquare.getAccessToken({
                     code: req.query.code
