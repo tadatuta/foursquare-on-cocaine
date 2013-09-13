@@ -89,9 +89,64 @@ app.get('/bla', function(req, res) {
    res.send('bla');
 });
 
-server.listen(app.get('handle'), function() {
-    console.log('Express server listening on ' +
-        (typeof app.get('handle') === 'number' ?
-            'port ' + app.get('handle') :
-            'cocane handle'));
-});
+
+var _detectAgent = function(req) {
+    var F = Q.defer();
+
+    var ua = req.headers['user-agent'];
+
+    if (ua) {
+        return uatraits.detect(ua);
+    } else {
+        F.resolve();
+    }
+
+    return F.promise;
+},
+    _detectRegion = function(req) {
+    var F = Q.defer();
+
+    var ip = req.headers['x-real-ip'];
+    if (ip && net.isIPv4(ip)) {
+
+        return geobase.region_id(ip)
+            .then(function(region_id){
+                return geobase.coordinates(region_id);
+            })
+            .then(function(names){
+                names.unshift(ip);
+                return names;
+            });
+
+    } else {
+
+        F.resolve();
+
+    }
+
+    return F.promise;
+};
+
+var initApp = function() {
+    server.listen(app.get('handle'), function() {
+        console.log('Express server listening on ' +
+            (typeof app.get('handle') === 'number' ?
+                'port ' + app.get('handle') :
+                'cocane handle'));
+    });
+};
+
+argv.uuid ? cocaine.getServices(['geobase', 'uatraits'], function(geobase, uatraits) {
+
+    Q.all([_detectAgent(req), _detectRegion(req)])
+        .spread(function(agent, region) {
+            app.set('agent', agent);
+            app.set('region', region);
+
+            initApp();
+        })
+        .fail(function(error){
+            res.end(error.toString());
+        });
+
+}) : initApp();
