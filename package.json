@@ -15,7 +15,9 @@
     "express": "~3.3.5",
     "optimist": "~0.6.0",
     "cocaine": "0.2.x",
-    "request": "~2.27.0"
+    "request": "~2.27.0",
+    "node-foursquare": "~0.2.0",
+    "q": "~0.9.7"
   },
   "devDependencies": {},
   "scripts": {
